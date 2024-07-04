@@ -10,4 +10,8 @@ interface AuthRepository {
     suspend fun getUserById(id: String): User?
 
     suspend fun registerUser(user: User): User
+
+    suspend fun saveRefreshTokenForUserId(userId: String, refreshToken: String)
+
+    suspend fun getRefreshTokenForUserId(userId: String): String?
 }

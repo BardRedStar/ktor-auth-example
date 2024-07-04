@@ -22,7 +22,7 @@ class ProfileViewImpl @Inject constructor(
         application.routing {
             authenticate("auth-jwt") {
                 get("/profile") {
-                    val userId = call.principal<JWTPrincipal>()?.payload?.subject
+                    val userId = call.principal<JWTPrincipal>()?.subject
 
                     if (userId == null) {
                         call.respond(

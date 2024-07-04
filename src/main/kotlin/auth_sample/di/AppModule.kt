@@ -7,10 +7,7 @@ import auth_sample.domain.repositories.ProfileRepository
 import auth_sample.domain.usecases.auth.*
 import auth_sample.domain.usecases.profile.GetProfileUseCase
 import auth_sample.domain.usecases.profile.GetProfileUseCaseImpl
-import auth_sample.utils.CryptoHelper
-import auth_sample.utils.CryptoHelperImpl
-import auth_sample.utils.JWTHelper
-import auth_sample.utils.JWTHelperImpl
+import auth_sample.utils.*
 import dagger.Binds
 import dagger.Module
 import dagger.Reusable
@@ -41,7 +38,7 @@ interface AppModule {
 
     @Binds
     @Reusable
-    fun bindCreateJWTTokenUseCase(impl: CreateJWTTokenUseCaseImpl): CreateJWTTokenUseCase
+    fun bindCreateJWTTokenUseCase(impl: CreateTokenPairUseCaseImpl): CreateTokenPairUseCase
 
     @Binds
     @Reusable
@@ -49,7 +46,11 @@ interface AppModule {
 
     @Binds
     @Reusable
-    fun bindJWTHelper(impl: JWTHelperImpl): JWTHelper
+    fun bindValidateRefreshTokenUseCase(impl: ValidateRefreshTokenUseCaseImpl): ValidateRefreshTokenUseCase
+
+    @Binds
+    @Reusable
+    fun bindJWTHelper(impl: TokenHelperImpl): TokenHelper
 
     @Binds
     @Reusable
