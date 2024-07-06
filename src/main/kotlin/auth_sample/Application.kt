@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureDependencyGraph()
     configureSerialization()
-    configureSecurity()
+    configureSecurity(AppComponentHolder.get().getTokenService())
     configureRouting()
 }
 

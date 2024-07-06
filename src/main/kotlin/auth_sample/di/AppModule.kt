@@ -2,6 +2,8 @@ package auth_sample.di
 
 import auth_sample.data.repository.AuthRepositoryImpl
 import auth_sample.data.repository.ProfileRepositoryImpl
+import auth_sample.data.service.TokenService
+import auth_sample.data.service.TokenServiceImpl
 import auth_sample.domain.repositories.AuthRepository
 import auth_sample.domain.repositories.ProfileRepository
 import auth_sample.domain.usecases.auth.*
@@ -50,7 +52,11 @@ interface AppModule {
 
     @Binds
     @Reusable
-    fun bindJWTHelper(impl: TokenHelperImpl): TokenHelper
+    fun bindValidateAccessTokenUseCase(impl: VerifyAccessTokenUseCaseImpl): VerifyAccessTokenUseCase
+
+    @Binds
+    @Reusable
+    fun bindJWTHelper(impl: TokenServiceImpl): TokenService
 
     @Binds
     @Reusable

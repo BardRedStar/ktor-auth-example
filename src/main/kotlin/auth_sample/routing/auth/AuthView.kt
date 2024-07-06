@@ -8,7 +8,6 @@ import auth_sample.routing.View
 import auth_sample.routing.auth.validators.LoginValidator
 import auth_sample.routing.auth.validators.RefreshTokenValidator
 import auth_sample.routing.auth.validators.RegisterValidator
-import auth_sample.utils.TokenHelper
 import auth_sample.utils.postValidated
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -26,6 +25,7 @@ class AuthViewImpl @Inject constructor(
     private val getUserByEmailUseCase: GetUserByEmailUseCase,
     private val registerUserUseCase: RegisterUserUseCase,
     private val validateRefreshTokenUseCase: ValidateRefreshTokenUseCase,
+    private val verifyAccessTokenUseCase: VerifyAccessTokenUseCase,
 ) : AuthView {
     override fun setupRouting(application: Application) {
         application.routing {
@@ -86,13 +86,13 @@ class AuthViewImpl @Inject constructor(
                 )
             }
 
-            postValidated("/refreshToken", RefreshTokenValidator()) {
-                val userId = call.principal<JWTPrincipal>()?.subject
+            postValidated("/refreshToken", RefreshTokenValidator()) { requestModel ->
+                val userId = verifyAccessTokenUseCase(requestModel.accessToken)
 
                 if (userId == null) {
                     call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse(code = 1, message = "Something went wrong")
+                        ErrorResponse(code = 1, message = "Access token is invalid")
                     )
                     return@postValidated
                 }

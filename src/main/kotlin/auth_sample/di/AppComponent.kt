@@ -2,6 +2,7 @@ package auth_sample.di
 
 import auth_sample.common.di.DIComponent
 import auth_sample.common.di.FeatureComponentHolder
+import auth_sample.data.service.TokenService
 import auth_sample.routing.auth.AuthView
 import auth_sample.routing.profile.ProfileView
 import dagger.Component
@@ -14,6 +15,8 @@ interface AppComponent: DIComponent {
     fun getAuthView(): AuthView
 
     fun getProfileView(): ProfileView
+
+    fun getTokenService(): TokenService
 
     @Component.Factory
     interface Factory {

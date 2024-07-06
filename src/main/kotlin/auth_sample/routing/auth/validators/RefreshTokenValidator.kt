@@ -7,8 +7,12 @@ import auth_sample.utils.Validator
 class RefreshTokenValidator: Validator<RefreshTokenRequest> {
 
     override fun validate(model: RefreshTokenRequest) {
-        if (model.token.isEmpty()) {
+        if (model.refreshToken.isEmpty()) {
             throw RequestValidationException("Refresh token must not be empty")
+        }
+
+        if (model.accessToken.isEmpty()) {
+            throw RequestValidationException("Access token must not be empty")
         }
     }
 }

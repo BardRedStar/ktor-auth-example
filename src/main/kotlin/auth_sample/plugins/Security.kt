@@ -1,32 +1,26 @@
 package auth_sample.plugins
 
 import auth_sample.models.view.response.ErrorResponse
-import auth_sample.utils.TokenHelperImpl
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
+import auth_sample.data.service.TokenService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 
-fun Application.configureSecurity() {
+fun Application.configureSecurity(tokenService: TokenService) {
     authentication {
         jwt("auth-jwt") {
-            realm = TokenHelperImpl.JWT_REALM
+            realm = tokenService.jwtRealm
+
             verifier(
-                JWT
-                    .require(Algorithm.HMAC256(TokenHelperImpl.JWT_SECRET))
-                    .withAudience(TokenHelperImpl.JWT_AUDIENCE)
-                    .withIssuer(TokenHelperImpl.JWT_DOMAIN)
-                    .build()
+                tokenService.jwtVerifier
             )
+
             validate { credential ->
-                if (credential.payload.audience.contains(TokenHelperImpl.JWT_AUDIENCE))
-                    JWTPrincipal(credential.payload)
-                else
-                    null
+                tokenService.verifyJWTToken(credential)
             }
+
             challenge { defaultScheme, realm ->
                 val response = ErrorResponse(
                     code = 1,
