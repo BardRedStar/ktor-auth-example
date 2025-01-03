@@ -11,14 +11,14 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureDependencyGraph()
     configureSerialization()
-    configureSecurity(AppComponentHolder.get().getTokenService())
+    configureSecurity(AppComponentHolder.get().getTokenUtils())
     configureRouting()
 }
 
 fun Application.configureRouting() {
     listOf(
-        AppComponentHolder.get().getAuthView(),
-        AppComponentHolder.get().getProfileView()
+        AppComponentHolder.get().getAuthController(),
+        AppComponentHolder.get().getProfileController()
     ).forEach {
         it.setupRouting(this)
     }

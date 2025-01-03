@@ -1,7 +1,6 @@
-package com.retroblade.achievo.data.service
+package com.retroblade.achievo.utils
 
 import com.retroblade.achievo.models.domain.RefreshTokenPayload
-import com.retroblade.achievo.utils.CryptoHelper
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
@@ -11,7 +10,7 @@ import kotlinx.serialization.json.Json
 import java.util.*
 import javax.inject.Inject
 
-interface TokenService {
+interface TokenUtils {
 
     val jwtVerifier: JWTVerifier
     val jwtRealm: String
@@ -24,9 +23,9 @@ interface TokenService {
     fun validateRefreshToken(token: String): Boolean
 }
 
-class TokenServiceImpl @Inject constructor(
+class TokenUtilsImpl @Inject constructor(
     private val cryptoHelper: CryptoHelper
-): TokenService {
+): TokenUtils {
 
     /// JWT
 

@@ -1,8 +1,14 @@
-package com.retroblade.achievo.data.repository
+package com.retroblade.achievo.repository
 
-import com.retroblade.achievo.domain.repositories.ProfileRepository
 import com.retroblade.achievo.models.domain.Profile
 import javax.inject.Inject
+
+interface ProfileRepository {
+
+    suspend fun addProfile(profile: Profile)
+
+    suspend fun getProfile(userId: String): Profile?
+}
 
 class ProfileRepositoryImpl @Inject constructor(): ProfileRepository {
 

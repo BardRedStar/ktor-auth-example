@@ -2,21 +2,21 @@ package com.retroblade.achievo.di
 
 import com.retroblade.achievo.common.di.DIComponent
 import com.retroblade.achievo.common.di.FeatureComponentHolder
-import com.retroblade.achievo.data.service.TokenService
-import com.retroblade.achievo.routing.auth.AuthView
-import com.retroblade.achievo.routing.profile.ProfileView
+import com.retroblade.achievo.utils.TokenUtils
+import com.retroblade.achievo.routing.auth.AuthController
+import com.retroblade.achievo.routing.profile.ProfileController
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, ViewModule::class])
+@Component(modules = [AppModule::class])
 @Singleton
 interface AppComponent: DIComponent {
 
-    fun getAuthView(): AuthView
+    fun getAuthController(): AuthController
 
-    fun getProfileView(): ProfileView
+    fun getProfileController(): ProfileController
 
-    fun getTokenService(): TokenService
+    fun getTokenUtils(): TokenUtils
 
     @Component.Factory
     interface Factory {

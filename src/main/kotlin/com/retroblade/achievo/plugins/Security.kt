@@ -1,24 +1,24 @@
 package com.retroblade.achievo.plugins
 
 import com.retroblade.achievo.models.view.response.ErrorResponse
-import com.retroblade.achievo.data.service.TokenService
+import com.retroblade.achievo.utils.TokenUtils
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 
-fun Application.configureSecurity(tokenService: TokenService) {
+fun Application.configureSecurity(tokenUtils: TokenUtils) {
     authentication {
         jwt("auth-jwt") {
-            realm = tokenService.jwtRealm
+            realm = tokenUtils.jwtRealm
 
             verifier(
-                tokenService.jwtVerifier
+                tokenUtils.jwtVerifier
             )
 
             validate { credential ->
-                tokenService.verifyJWTToken(credential)
+                tokenUtils.verifyJWTToken(credential)
             }
 
             challenge { defaultScheme, realm ->

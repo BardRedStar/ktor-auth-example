@@ -13,33 +13,3 @@ interface Validator<Model> {
     fun validate(model: Model)
 }
 
-inline fun <reified Model: Any> Route.postValidated(
-    path: String,
-    validator: Validator<Model>,
-    crossinline body: suspend PipelineContext<Unit, ApplicationCall>.(Model) -> Unit
-) {
-    post(path) {
-        try {
-            val model = call.receive<Model>()
-            validator.validate(model)
-
-            body(model)
-        } catch (e: RequestValidationException) {
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse(
-                    code = 1,
-                    message = e.message
-                )
-            )
-        } catch(e: JsonConvertException) {
-            call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorResponse(
-                    code = 1,
-                    message = "User not fould for such credentials"
-                )
-            )
-        }
-    }
-}
