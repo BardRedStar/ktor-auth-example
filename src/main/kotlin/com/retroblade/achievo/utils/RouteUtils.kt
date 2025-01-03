@@ -5,6 +5,7 @@ import com.retroblade.achievo.models.view.response.ErrorResponse
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -59,12 +60,12 @@ inline fun <reified Model: Any> Route.postAutoResult(
                     message = e.message
                 )
             )
-        } catch(e: JsonConvertException) {
+        } catch(e: BadRequestException) {
             call.respond(
                 HttpStatusCode.BadRequest,
                 ErrorResponse(
                     code = HttpStatusCode.BadRequest.value,
-                    message = "Json is invalid"
+                    message = "Something went wrong with your request"
                 )
             )
         }
