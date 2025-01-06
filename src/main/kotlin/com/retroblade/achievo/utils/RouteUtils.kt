@@ -13,10 +13,10 @@ import io.ktor.util.pipeline.*
 
 inline fun Route.getAutoResult(
     path: String,
-    crossinline body: suspend PipelineContext<Unit, ApplicationCall>.(Parameters) -> MethodResult<Any>
+    crossinline body: suspend PipelineContext<Unit, ApplicationCall>.(ApplicationCall) -> MethodResult<Any>
 ) {
     get(path) {
-        val result = body(call.parameters)
+        val result = body(call)
 
         when (result) {
             is MethodResult.Success -> call.respond(
@@ -34,13 +34,14 @@ inline fun Route.getAutoResult(
 inline fun <reified Model: Any> Route.postAutoResult(
     path: String,
     validator: Validator<Model>? = null,
-    crossinline body: suspend PipelineContext<Unit, ApplicationCall>.(Parameters, Model) -> MethodResult<Any>
+    crossinline body: suspend PipelineContext<Unit, ApplicationCall>.(ApplicationCall, Model) -> MethodResult<Any>
 ) {
     post(path) {
         try {
             val model = call.receive<Model>()
             validator?.validate(model)
-            val result = body(call.parameters, model)
+            call.request.queryParameters
+            val result = body(call, model)
 
             when (result) {
                 is MethodResult.Success -> call.respond(

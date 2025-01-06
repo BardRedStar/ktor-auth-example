@@ -10,9 +10,5 @@ class RefreshTokenValidator: Validator<RefreshTokenRequest> {
         if (model.refreshToken.isEmpty()) {
             throw RequestValidationException("Refresh token must not be empty")
         }
-
-        if (model.accessToken.isEmpty()) {
-            throw RequestValidationException("Access token must not be empty")
-        }
     }
 }

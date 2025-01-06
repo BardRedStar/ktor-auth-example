@@ -14,7 +14,7 @@ fun Application.configureSecurity(tokenUtils: TokenUtils) {
             realm = tokenUtils.jwtRealm
 
             verifier(
-                tokenUtils.jwtVerifier
+                tokenUtils.accessTokenJwtVerifier
             )
 
             validate { credential ->

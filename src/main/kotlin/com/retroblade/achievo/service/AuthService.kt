@@ -9,7 +9,10 @@ import com.retroblade.achievo.repository.AuthRepository
 import com.retroblade.achievo.repository.ProfileRepository
 import com.retroblade.achievo.repository.TokenRepository
 import com.retroblade.achievo.utils.CryptoHelper
+import com.retroblade.achievo.utils.TokenUtils
 import io.ktor.http.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
 interface AuthService {
@@ -18,15 +21,18 @@ interface AuthService {
 
     suspend fun loginUser(email: String, password: String): MethodResult<TokenResponse>
 
-    suspend fun refreshToken(accessToken: String): MethodResult<TokenResponse>
+    suspend fun refreshToken(refreshToken: String): MethodResult<TokenResponse>
 }
 
 class AuthServiceImpl @Inject constructor(
     private val cryptoHelper: CryptoHelper,
+    private val tokenUtils: TokenUtils,
     private val authRepository: AuthRepository,
     private val tokenRepository: TokenRepository,
     private val profileRepository: ProfileRepository,
 ): AuthService {
+
+    private val logger = LoggerFactory.getLogger(AuthServiceImpl::class.java)
 
     override suspend fun registerUser(user: RegisterUser): MethodResult<TokenResponse> {
         val existingUser = authRepository.getUserByEmail(user.email)
@@ -72,17 +78,15 @@ class AuthServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshToken(accessToken: String): MethodResult<TokenResponse> {
-        val userId = tokenRepository.verifyAccessToken(accessToken)
-
-        if (userId == null) {
-            return MethodResult.error(httpCode = HttpStatusCode.BadRequest, message = "Access token is invalid")
+    override suspend fun refreshToken(refreshToken: String): MethodResult<TokenResponse> {
+        if (tokenRepository.validateRefreshToken(refreshToken)) {
+            return MethodResult.error(httpCode = HttpStatusCode.BadRequest, message = "Refresh token is invalid")
         }
+        val userId = tokenUtils.getUserIdFromToken(refreshToken)
 
-        val isRefreshTokenValid = tokenRepository.validateRefreshTokenForUserId(userId = userId)
-
-        if (!isRefreshTokenValid) {
-            return MethodResult.error(HttpStatusCode.BadRequest, message = "Refresh token was not found, expired or malformed")
+        if(userId == null){
+            logger.error("Wrong data in token: token $refreshToken")
+            return MethodResult.error(httpCode = HttpStatusCode.BadRequest, message = "Something went wrong")
         }
 
         val token = tokenRepository.createTokenPairForUserId(userId = userId)

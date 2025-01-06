@@ -1,5 +1,6 @@
 package com.retroblade.achievo.routing.auth
 
+import com.retroblade.achievo.common.MethodResult
 import com.retroblade.achievo.service.AuthService
 import com.retroblade.achievo.models.domain.RegisterUser
 import com.retroblade.achievo.models.view.request.LoginRequest
@@ -9,7 +10,9 @@ import com.retroblade.achievo.routing.BaseController
 import com.retroblade.achievo.routing.auth.validators.LoginValidator
 import com.retroblade.achievo.routing.auth.validators.RefreshTokenValidator
 import com.retroblade.achievo.routing.auth.validators.RegisterValidator
+import com.retroblade.achievo.utils.getAutoResult
 import com.retroblade.achievo.utils.postAutoResult
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import javax.inject.Inject
@@ -19,11 +22,11 @@ class AuthController @Inject constructor(
 ) : BaseController {
     override fun setupRouting(application: Application) {
         application.routing {
-            postAutoResult<LoginRequest>("/login", LoginValidator()) { params, requestModel ->
+            postAutoResult<LoginRequest>("/login", LoginValidator()) { call, requestModel ->
                 authService.loginUser(requestModel.email, requestModel.password)
             }
 
-            postAutoResult<RegisterRequest>("/register", RegisterValidator()) { params, requestModel ->
+            postAutoResult<RegisterRequest>("/register", RegisterValidator()) { call, requestModel ->
                 val registerUserModel = RegisterUser(
                     userName = requestModel.userName,
                     firstName = requestModel.firstName,
@@ -35,7 +38,7 @@ class AuthController @Inject constructor(
             }
 
             postAutoResult<RefreshTokenRequest>("/refreshToken", RefreshTokenValidator()) { params, requestModel ->
-                authService.refreshToken(requestModel.accessToken)
+                authService.refreshToken(requestModel.refreshToken)
             }
         }
     }
