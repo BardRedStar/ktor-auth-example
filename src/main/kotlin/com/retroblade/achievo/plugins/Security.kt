@@ -1,6 +1,7 @@
 package com.retroblade.achievo.plugins
 
 import com.retroblade.achievo.models.view.response.ErrorResponse
+import com.retroblade.achievo.utils.AUTH_CONFIG_NAMESPACE
 import com.retroblade.achievo.utils.TokenUtils
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -10,7 +11,7 @@ import io.ktor.server.response.*
 
 fun Application.configureSecurity(tokenUtils: TokenUtils) {
     authentication {
-        jwt("auth-jwt") {
+        jwt(AUTH_CONFIG_NAMESPACE) {
             realm = tokenUtils.jwtRealm
 
             verifier(

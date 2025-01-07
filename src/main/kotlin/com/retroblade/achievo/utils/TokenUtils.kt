@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTDecodeException
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.server.auth.jwt.*
+import org.slf4j.LoggerFactory
 import java.util.*
 import javax.inject.Inject
 
@@ -26,6 +27,8 @@ interface TokenUtils {
 class TokenUtilsImpl @Inject constructor(
     private val cryptoHelper: CryptoHelper
 ) : TokenUtils {
+
+    private val logger = LoggerFactory.getLogger(TokenUtilsImpl::class.java)
 
     /// JWT
 
@@ -103,6 +106,7 @@ class TokenUtilsImpl @Inject constructor(
             refreshTokenJwtVerifier.verify(token)
             true
         } catch (ex: Exception) {
+            logger.error("An error occurred while verifying refresh token", ex)
             false
         }
     }
@@ -112,9 +116,9 @@ class TokenUtilsImpl @Inject constructor(
         private const val JWT_DOMAIN = "https://jwt-provider-domain/"
         private const val JWT_REALM = "ktor sample app"
         private const val JWT_SECRET = "secret"
-        private const val ACCESS_TOKEN_LIFETIME_MILLIS = 60 * 1000
+        private const val ACCESS_TOKEN_LIFETIME_MILLIS = 30L * 60 * 1000
 
         private const val REFRESH_TOKEN_SECRET = "irou@!123SADasa"
-        private const val REFRESH_TOKEN_LIFETIME_MILLIS = 120 * 1000
+        private const val REFRESH_TOKEN_LIFETIME_MILLIS = 7L * 24 * 60 * 60 * 1000
     }
 }

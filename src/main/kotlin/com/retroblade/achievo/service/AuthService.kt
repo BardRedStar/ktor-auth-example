@@ -21,7 +21,9 @@ interface AuthService {
 
     suspend fun loginUser(email: String, password: String): MethodResult<TokenResponse>
 
-    suspend fun refreshToken(refreshToken: String): MethodResult<TokenResponse>
+    suspend fun refreshToken(accessToken: String, refreshToken: String): MethodResult<TokenResponse>
+
+    suspend fun logout(accessToken: String): MethodResult<Unit>
 }
 
 class AuthServiceImpl @Inject constructor(
@@ -78,8 +80,8 @@ class AuthServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshToken(refreshToken: String): MethodResult<TokenResponse> {
-        if (tokenRepository.validateRefreshToken(refreshToken)) {
+    override suspend fun refreshToken(accessToken: String, refreshToken: String): MethodResult<TokenResponse> {
+        if (!tokenRepository.validateRefreshToken(accessToken, refreshToken)) {
             return MethodResult.error(httpCode = HttpStatusCode.BadRequest, message = "Refresh token is invalid")
         }
         val userId = tokenUtils.getUserIdFromToken(refreshToken)
@@ -93,5 +95,13 @@ class AuthServiceImpl @Inject constructor(
         return MethodResult.success(
             TokenResponse(accessToken = token.accessToken, refreshToken = token.refreshToken)
         )
+    }
+
+    override suspend fun logout(accessToken: String): MethodResult<Unit> {
+        return if(tokenRepository.removeRefreshToken(accessToken)) {
+            MethodResult.success(Unit)
+        } else {
+            MethodResult.error(httpCode = HttpStatusCode.BadRequest, message = "Something went wrong")
+        }
     }
 }

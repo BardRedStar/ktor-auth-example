@@ -3,6 +3,8 @@ package com.retroblade.achievo.routing.profile
 import com.retroblade.achievo.common.MethodResult
 import com.retroblade.achievo.routing.BaseController
 import com.retroblade.achievo.service.ProfileService
+import com.retroblade.achievo.utils.apiRouting
+import com.retroblade.achievo.utils.apiRoutingAuthorized
 import com.retroblade.achievo.utils.getAutoResult
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -16,16 +18,14 @@ class ProfileController @Inject constructor(
 ) : BaseController {
 
     override fun setupRouting(application: Application) {
-        application.routing {
-            authenticate("auth-jwt") {
-                getAutoResult("/profile") {
-                    val userId = call.principal<JWTPrincipal>()?.subject
+        application.apiRoutingAuthorized {
+            getAutoResult("/profile") {
+                val userId = call.principal<JWTPrincipal>()?.subject
 
-                    if (userId != null) {
-                        profileService.getProfile(userId)
-                    } else {
-                        MethodResult.error(HttpStatusCode.Forbidden, message = "User not allowed")
-                    }
+                if (userId != null) {
+                    profileService.getProfile(userId)
+                } else {
+                    MethodResult.error(HttpStatusCode.Forbidden, message = "User not allowed")
                 }
             }
         }

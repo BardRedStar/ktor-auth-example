@@ -10,10 +10,13 @@ import com.retroblade.achievo.routing.BaseController
 import com.retroblade.achievo.routing.auth.validators.LoginValidator
 import com.retroblade.achievo.routing.auth.validators.RefreshTokenValidator
 import com.retroblade.achievo.routing.auth.validators.RegisterValidator
+import com.retroblade.achievo.utils.apiRouting
+import com.retroblade.achievo.utils.apiRoutingAuthorized
 import com.retroblade.achievo.utils.getAutoResult
 import com.retroblade.achievo.utils.postAutoResult
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import javax.inject.Inject
 
@@ -21,7 +24,7 @@ class AuthController @Inject constructor(
     private val authService: AuthService,
 ) : BaseController {
     override fun setupRouting(application: Application) {
-        application.routing {
+        application.apiRouting {
             postAutoResult<LoginRequest>("/login", LoginValidator()) { call, requestModel ->
                 authService.loginUser(requestModel.email, requestModel.password)
             }
@@ -37,9 +40,28 @@ class AuthController @Inject constructor(
                 authService.registerUser(registerUserModel)
             }
 
-            postAutoResult<RefreshTokenRequest>("/refreshToken", RefreshTokenValidator()) { params, requestModel ->
-                authService.refreshToken(requestModel.refreshToken)
+            postAutoResult<RefreshTokenRequest>("/refreshToken", RefreshTokenValidator()) { call, requestModel ->
+                authService.refreshToken(requestModel.accessToken, requestModel.refreshToken)
             }
         }
+
+        application.apiRoutingAuthorized {
+            postAutoResult("/logout") { call ->
+                call.request
+                    .headers
+                    .getTokenOrNull()
+                    ?.let { accessToken -> authService.logout(accessToken) }
+                    ?: MethodResult.error(HttpStatusCode.BadRequest, "Auth header is not valid")
+            }
+        }
+    }
+
+    private fun Headers.getTokenOrNull(): String? {
+        return this.get(AUTH_HEADER_KEY)?.substring(TOKEN_START_INDEX)
+    }
+
+    private companion object {
+        const val AUTH_HEADER_KEY = "Authorization"
+        const val TOKEN_START_INDEX = 7
     }
 }
